@@ -108,32 +108,6 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleApprove = () => {
-    approveMutation.mutate(
-      { crossingId: crossing.id, approvedPayloadHash: crossing.proposed_payload_hash },
-      {
-        onSuccess: () => {
-          toast({ title: 'Message sent', description: 'Crossing approved and sent.' });
-          onApprove?.(crossing.id);
-        },
-        onError: (err) => {
-          toast({ title: 'Send failed', description: err.message, variant: 'destructive' });
-        },
-      }
-    );
-  };
-
-  const handleDeny = () => {
-    denyMutation.mutate(crossing.id, {
-      onSuccess: () => {
-        toast({ title: 'Crossing denied', description: 'The crossing has been denied.' });
-        onDeny?.(crossing.id);
-      },
-      onError: (err) => {
-        toast({ title: 'Deny failed', description: err.message, variant: 'destructive' });
-      },
-    });
-  };
 
   const sourceLabels: string[] = Array.isArray(crossing.source_labels) ? crossing.source_labels : [];
 
