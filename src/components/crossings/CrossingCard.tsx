@@ -43,10 +43,17 @@ export function CrossingCard({ crossing, isSelected, onClick }: CrossingCardProp
   const ago = getTimeAgo(crossing.created_at);
 
   return (
-    <button
+    <motion.button
+      layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8, scale: 0.97 }}
+      whileHover={{ scale: 1.015 }}
+      whileTap={{ scale: 0.985 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       onClick={onClick}
       className={cn(
-        'w-full text-left rounded-lg border bg-card p-4 transition-all hover:bg-accent/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'w-full text-left rounded-lg border bg-card p-4 transition-colors hover:bg-accent/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         isSelected && 'border-primary/50 airlock-glow bg-accent/30',
         !isSelected && 'border-border',
       )}
@@ -77,7 +84,7 @@ export function CrossingCard({ crossing, isSelected, onClick }: CrossingCardProp
           <p className="text-xs text-destructive">{crossing.policy_reason_text}</p>
         </div>
       )}
-    </button>
+    </motion.button>
   );
 }
 
