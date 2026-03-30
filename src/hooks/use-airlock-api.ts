@@ -56,7 +56,7 @@ export function useCrossingsQuery(mode?: 'pending' | 'receipts') {
     queryFn: () => callFunction('crossings', {
       params: mode ? { mode } : {},
     }),
-    refetchInterval: 3000,
+    // No polling — realtime handles updates
     retry: 1,
   });
 }
