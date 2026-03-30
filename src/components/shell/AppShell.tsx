@@ -1,47 +1,12 @@
 import { ReactNode } from 'react';
-import { Shield, LogOut, User, Terminal, Zap, Sun, Moon, Monitor } from 'lucide-react';
+import { Shield, LogOut, User, Terminal, Zap } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { useTheme } from '@/hooks/useTheme';
 
 interface AppShellProps {
   children: ReactNode;
   user?: { displayName?: string; email?: string } | null;
-}
-
-function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-
-  const options: { value: 'light' | 'dark' | 'system'; icon: typeof Sun; label: string }[] = [
-    { value: 'light', icon: Sun, label: 'Light' },
-    { value: 'dark', icon: Moon, label: 'Dark' },
-    { value: 'system', icon: Monitor, label: 'System' },
-  ];
-
-  return (
-    <div className="flex items-center rounded border border-border bg-secondary/30 p-0.5">
-      {options.map(opt => {
-        const Icon = opt.icon;
-        const active = theme === opt.value;
-        return (
-          <button
-            key={opt.value}
-            onClick={() => setTheme(opt.value)}
-            className={cn(
-              'rounded p-1 transition-all',
-              active
-                ? 'bg-primary/15 text-primary'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
-            title={opt.label}
-          >
-            <Icon className="h-3 w-3" />
-          </button>
-        );
-      })}
-    </div>
-  );
 }
 
 export function AppShell({ children, user: userProp }: AppShellProps) {
@@ -92,7 +57,6 @@ export function AppShell({ children, user: userProp }: AppShellProps) {
               </nav>
             </div>
             <div className="flex items-center gap-2">
-              <ThemeToggle />
               {displayUser && (
                 <>
                   <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground bg-secondary/50 rounded px-2.5 py-1 border border-border">
