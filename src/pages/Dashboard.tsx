@@ -9,7 +9,7 @@ import { useCrossingsRealtime } from '@/hooks/use-crossings-realtime';
 import { useNavigate } from 'react-router-dom';
 import { Inbox, FileCheck } from 'lucide-react';
 import { MOCK_STATUS, MOCK_CROSSINGS } from '@/lib/mock-data';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function DashboardPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
