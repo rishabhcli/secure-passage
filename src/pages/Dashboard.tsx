@@ -9,6 +9,7 @@ import { useCrossingsRealtime } from '@/hooks/use-crossings-realtime';
 import { useNavigate } from 'react-router-dom';
 import { Inbox, FileCheck } from 'lucide-react';
 import { MOCK_STATUS, MOCK_CROSSINGS } from '@/lib/mock-data';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function DashboardPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -83,7 +84,7 @@ export default function DashboardPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <AnimatePresence mode="popLayout">
               {pending.map(crossing => (
                 <CrossingCard
                   key={crossing.id}
@@ -92,7 +93,7 @@ export default function DashboardPage() {
                   onClick={() => setSelectedId(crossing.id)}
                 />
               ))}
-            </div>
+            </AnimatePresence>
           )}
         </div>
 
@@ -128,17 +129,27 @@ export default function DashboardPage() {
       </div>
 
       {/* Review Drawer */}
-      {selectedId && (
-        <>
-          <div className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm" onClick={() => setSelectedId(null)} />
-          <CrossingReviewDrawer
-            crossingId={selectedId}
-            onClose={() => setSelectedId(null)}
-            onApprove={() => setSelectedId(null)}
-            onDeny={() => setSelectedId(null)}
-          />
-        </>
-      )}
+      <AnimatePresence>
+        {selectedId && (
+          <>
+            <motion.div
+              key="overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm"
+              onClick={() => setSelectedId(null)}
+            />
+            <CrossingReviewDrawer
+              crossingId={selectedId}
+              onClose={() => setSelectedId(null)}
+              onApprove={() => setSelectedId(null)}
+              onDeny={() => setSelectedId(null)}
+            />
+          </>
+        )}
+      </AnimatePresence>
     </AppShell>
   );
 }
