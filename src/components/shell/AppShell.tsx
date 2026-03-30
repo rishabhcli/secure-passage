@@ -1,9 +1,8 @@
 import { ReactNode } from 'react';
-import { Shield, LogOut, User, Terminal, Zap, Sun, Moon, Monitor } from 'lucide-react';
+import { Shield, LogOut, User, Terminal, Zap } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { useTheme } from '@/hooks/useTheme';
 
 interface AppShellProps {
   children: ReactNode;
