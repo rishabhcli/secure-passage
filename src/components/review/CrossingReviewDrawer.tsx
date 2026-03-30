@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useCrossingDetailQuery, useApproveSendMutation, useDenyCrossingMutation } from '@/hooks/use-airlock-api';
 import { MOCK_CROSSINGS } from '@/lib/mock-data';
 import { X, ExternalLink, Shield, Send, Ban, CheckCircle2, Copy, Hash, GitBranch } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 
@@ -22,6 +22,58 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
   const denyMutation = useDenyCrossingMutation();
 
   const crossing = detail?.crossing || MOCK_CROSSINGS.find(c => c.id === crossingId);
+
+  const isReviewable = crossing?.status === 'ready_for_review';
+  const isSending = approveMutation.isPending;
+
+  const handleApprove = useCallback(() => {
+    if (!crossing) return;
+    approveMutation.mutate(
+      { crossingId: crossing.id, approvedPayloadHash: crossing.proposed_payload_hash },
+      {
+        onSuccess: () => {
+          toast({ title: 'Message sent', description: 'Crossing approved and sent.' });
+          onApprove?.(crossing.id);
+        },
+        onError: (err) => {
+          toast({ title: 'Send failed', description: err.message, variant: 'destructive' });
+        },
+      }
+    );
+  }, [crossing, approveMutation, toast, onApprove]);
+
+  const handleDeny = useCallback(() => {
+    if (!crossing) return;
+    denyMutation.mutate(crossing.id, {
+      onSuccess: () => {
+        toast({ title: 'Crossing denied', description: 'The crossing has been denied.' });
+        onDeny?.(crossing.id);
+      },
+      onError: (err) => {
+        toast({ title: 'Deny failed', description: err.message, variant: 'destructive' });
+      },
+    });
+  }, [crossing, denyMutation, toast, onDeny]);
+
+  // Keyboard shortcuts: ⌘/Ctrl+Enter = approve, ⌘/Ctrl+Backspace = deny, Escape = close
+  useEffect(() => {
+    if (!crossingId) return;
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      } else if (mod && e.key === 'Enter' && isReviewable && !isSending) {
+        e.preventDefault();
+        handleApprove();
+      } else if (mod && e.key === 'Backspace' && isReviewable && !denyMutation.isPending) {
+        e.preventDefault();
+        handleDeny();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [crossingId, isReviewable, isSending, denyMutation.isPending, handleApprove, handleDeny, onClose]);
 
   if (!crossingId || (!crossing && !isLoading)) return null;
 
@@ -47,10 +99,8 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
     );
   }
 
-  const isReviewable = crossing.status === 'ready_for_review';
   const isBlocked = crossing.status === 'blocked_pre_review';
   const isSent = crossing.status === 'sent';
-  const isSending = approveMutation.isPending;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(crossing.proposed_text);
@@ -58,32 +108,6 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleApprove = () => {
-    approveMutation.mutate(
-      { crossingId: crossing.id, approvedPayloadHash: crossing.proposed_payload_hash },
-      {
-        onSuccess: () => {
-          toast({ title: 'Message sent', description: 'Crossing approved and sent.' });
-          onApprove?.(crossing.id);
-        },
-        onError: (err) => {
-          toast({ title: 'Send failed', description: err.message, variant: 'destructive' });
-        },
-      }
-    );
-  };
-
-  const handleDeny = () => {
-    denyMutation.mutate(crossing.id, {
-      onSuccess: () => {
-        toast({ title: 'Crossing denied', description: 'The crossing has been denied.' });
-        onDeny?.(crossing.id);
-      },
-      onError: (err) => {
-        toast({ title: 'Deny failed', description: err.message, variant: 'destructive' });
-      },
-    });
-  };
 
   const sourceLabels: string[] = Array.isArray(crossing.source_labels) ? crossing.source_labels : [];
 
@@ -237,6 +261,7 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
             >
               <Ban className="h-3.5 w-3.5 mr-1.5" />
               Deny
+              <kbd className="ml-auto text-[9px] font-mono opacity-50">⌘⌫</kbd>
             </Button>
             <Button
               size="sm"
@@ -246,6 +271,7 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
             >
               <Send className="h-3.5 w-3.5 mr-1.5" />
               {isSending ? 'Sending...' : 'Approve & Send'}
+              <kbd className="ml-auto text-[9px] font-mono opacity-50">⌘↵</kbd>
             </Button>
           </div>
         </div>
