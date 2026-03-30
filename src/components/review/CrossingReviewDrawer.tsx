@@ -5,6 +5,7 @@ import { MOCK_CROSSINGS } from '@/lib/mock-data';
 import { X, ExternalLink, Shield, Send, Ban, CheckCircle2, Copy, Hash } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CrossingReviewDrawerProps {
   crossingId: string | null;
