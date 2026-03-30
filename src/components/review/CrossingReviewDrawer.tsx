@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useCrossingDetailQuery, useApproveSendMutation, useDenyCrossingMutation } from '@/hooks/use-airlock-api';
 import { MOCK_CROSSINGS } from '@/lib/mock-data';
 import { X, ExternalLink, Shield, Send, Ban, CheckCircle2, Copy, Hash, GitBranch } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 
