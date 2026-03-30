@@ -39,7 +39,7 @@ export default function LandingPage() {
         <Button
           size="lg"
           className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-display tracking-wider uppercase"
-          onClick={() => navigate('/airlock')}
+          onClick={() => navigate('/login')}
         >
           Enter AIRLOCK
         </Button>
