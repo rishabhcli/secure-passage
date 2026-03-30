@@ -6,6 +6,18 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-airlock-companion-secret",
 };
 
+const DEMO_USER_ID = "demo-user-00000000-0000-0000-0000-000000000000";
+
+async function resolveUserId(req: Request, supabase: any): Promise<string> {
+  const authHeader = req.headers.get("Authorization");
+  if (authHeader) {
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (!error && user) return user.id;
+  }
+  return DEMO_USER_ID;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -18,31 +30,14 @@ serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const pathParts = url.pathname.split("/").filter(Boolean);
-    // Routes: GET / (list), GET /:id, POST /:id/approve-send, POST /:id/deny
+    const userId = await resolveUserId(req, supabase);
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-    const userId = user.id;
-
-    // Parse sub-path from query param since edge functions use flat routing
-    const action = url.searchParams.get("action"); // "list", "detail", "approve-send", "deny"
+    const action = url.searchParams.get("action");
     const crossingId = url.searchParams.get("id");
 
     // LIST crossings
     if (req.method === "GET" && (!action || action === "list")) {
-      const mode = url.searchParams.get("mode"); // "pending" | "receipts" | null (all)
+      const mode = url.searchParams.get("mode");
 
       let query = supabase
         .from("crossings")
@@ -103,7 +98,6 @@ serve(async (req) => {
         });
       }
 
-      // Fetch crossing
       const { data: crossing, error: fetchErr } = await supabase
         .from("crossings")
         .select("*")
@@ -130,7 +124,6 @@ serve(async (req) => {
         });
       }
 
-      // Log send.started
       await supabase.from("crossing_events").insert({
         crossing_id: crossingId,
         auth0_user_sub: userId,
@@ -140,7 +133,6 @@ serve(async (req) => {
         message: "Executing outbound Slack message through connected account",
       });
 
-      // Update status to sending
       await supabase.from("crossings").update({ status: "sending", write_check_status: "sending" }).eq("id", crossingId);
 
       // Mock Slack send
@@ -152,7 +144,6 @@ serve(async (req) => {
         message: { text: crossing.proposed_text },
       };
 
-      // Update crossing to sent
       const { error: updateErr } = await supabase.from("crossings").update({
         status: "sent",
         write_check_status: "sent",
@@ -165,7 +156,6 @@ serve(async (req) => {
 
       if (updateErr) throw updateErr;
 
-      // Log send.succeeded
       await supabase.from("crossing_events").insert({
         crossing_id: crossingId,
         auth0_user_sub: userId,

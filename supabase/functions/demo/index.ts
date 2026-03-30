@@ -6,6 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const DEMO_USER_ID = "demo-user-00000000-0000-0000-0000-000000000000";
+
 function computePayloadHash(destinationKind: string, channelId: string, text: string): string {
   const input = `${destinationKind}|${channelId}|${text}`;
   let hash = 0;
@@ -15,6 +17,16 @@ function computePayloadHash(destinationKind: string, channelId: string, text: st
     hash = hash & hash;
   }
   return `sha256:${Math.abs(hash).toString(16).padStart(8, "0")}`;
+}
+
+async function resolveUserId(req: Request, supabase: any): Promise<string> {
+  const authHeader = req.headers.get("Authorization");
+  if (authHeader) {
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (!error && user) return user.id;
+  }
+  return DEMO_USER_ID;
 }
 
 serve(async (req) => {
@@ -33,26 +45,12 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-    const userId = user.id;
+    const userId = await resolveUserId(req, supabase);
 
     const url = new URL(req.url);
-    const action = url.searchParams.get("action"); // "reset", "seed-valid", "seed-blocked"
+    const action = url.searchParams.get("action");
 
     if (action === "reset") {
-      // Delete all crossings and events for user
       const { data: crossings } = await supabase.from("crossings").select("id").eq("auth0_user_sub", userId);
       if (crossings && crossings.length > 0) {
         const ids = crossings.map((c: any) => c.id);
@@ -103,7 +101,6 @@ serve(async (req) => {
 
       if (insertErr) throw insertErr;
 
-      // Seed events
       const events = [
         { event_type: "intent.received", actor_type: "companion", actor_id: "companion-local-01", message: "Intent received from local companion" },
         { event_type: "source.verification.started", actor_type: "system", message: "Verifying GitHub issue acme-corp/platform-api#342" },
@@ -119,7 +116,6 @@ serve(async (req) => {
         });
       }
 
-      // Also seed heartbeat
       await supabase.from("companion_heartbeats").upsert({
         companion_id: "companion-local-01",
         auth0_user_sub: userId,
