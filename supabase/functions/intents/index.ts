@@ -1,46 +1,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  DEMO_USER_ID,
+  computePayloadHash,
+  evaluatePolicy,
+  getMissingIntentFields,
+  type IntentRequestBody,
+  resolveUserIdFromAuthHeader,
+} from "../_shared/airlock.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-airlock-companion-secret",
 };
-
-// Deterministic payload hash
-function computePayloadHash(destinationKind: string, channelId: string, text: string): string {
-  const input = `${destinationKind}|${channelId}|${text}`;
-  let hash = 0;
-  for (let i = 0; i < input.length; i++) {
-    const char = input.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return `sha256:${Math.abs(hash).toString(16).padStart(8, "0")}`;
-}
-
-// Policy evaluation
-function evaluatePolicy(intent: any): { result: string; reasonCode: string | null; reasonText: string | null } {
-  const allowedChannel = Deno.env.get("AIRLOCK_ALLOWED_SLACK_CHANNEL_ID") || "C0123INCIDENTS";
-  const maxLen = parseInt(Deno.env.get("AIRLOCK_MAX_MESSAGE_LENGTH") || "2000");
-
-  if (intent.sourceKind !== "github_issue") {
-    return { result: "block", reasonCode: "invalid_source_kind", reasonText: "Source kind must be github_issue" };
-  }
-  if (intent.destinationKind !== "slack_post_message") {
-    return { result: "block", reasonCode: "invalid_destination_kind", reasonText: "Destination kind must be slack_post_message" };
-  }
-  if (intent.destinationChannelId !== allowedChannel) {
-    return {
-      result: "block",
-      reasonCode: "destination_channel_not_allowed",
-      reasonText: `Blocked: destination channel ${intent.destinationChannelLabel} is not allowed. Only the configured incident channel is permitted.`,
-    };
-  }
-  if (intent.proposedText.length > maxLen) {
-    return { result: "block", reasonCode: "proposed_text_too_long", reasonText: `Proposed text exceeds maximum length of ${maxLen} characters` };
-  }
-  return { result: "allow_review", reasonCode: null, reasonText: null };
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -59,8 +31,6 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const DEMO_USER_ID = "demo-user-00000000-0000-0000-0000-000000000000";
-
     // Auth: companion secret, user JWT, or demo fallback
     const companionSecret = req.headers.get("x-airlock-companion-secret");
     const authHeader = req.headers.get("Authorization");
@@ -73,19 +43,17 @@ serve(async (req) => {
           status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const body = await req.json();
+      const body = (await req.json()) as IntentRequestBody;
       userId = body.auth0UserSub || DEMO_USER_ID;
       return await processIntent(supabase, userId, body);
     } else if (authHeader) {
-      const token = authHeader.replace("Bearer ", "");
-      const { data: { user }, error } = await supabase.auth.getUser(token);
-      userId = (!error && user) ? user.id : DEMO_USER_ID;
-      const body = await req.json();
+      userId = await resolveUserIdFromAuthHeader(supabase, authHeader);
+      const body = (await req.json()) as IntentRequestBody;
       body.auth0UserSub = userId;
       return await processIntent(supabase, userId, body);
     } else {
       // Demo fallback - no auth required
-      const body = await req.json();
+      const body = (await req.json()) as IntentRequestBody;
       userId = body.auth0UserSub || DEMO_USER_ID;
       return await processIntent(supabase, userId, body);
     }
@@ -97,22 +65,21 @@ serve(async (req) => {
   }
 });
 
-async function processIntent(supabase: any, userId: string, body: any) {
-  // Validate required fields
-  const required = ["idempotencyKey", "sourceKind", "sourceRepoOwner", "sourceRepoName", "sourceIssueNumber", "destinationKind", "destinationChannelId", "destinationChannelLabel", "proposedText"];
-  for (const field of required) {
-    if (!body[field] && body[field] !== 0) {
-      return new Response(JSON.stringify({ error: `Missing required field: ${field}` }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+type SupabaseClient = ReturnType<typeof createClient>;
+
+async function processIntent(supabase: SupabaseClient, userId: string, body: IntentRequestBody) {
+  const missingFields = getMissingIntentFields(body);
+  if (missingFields.length > 0) {
+    return new Response(JSON.stringify({ error: `Missing required field: ${missingFields[0]}` }), {
+      status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   // Check idempotency
   const { data: existing } = await supabase
     .from("crossings")
     .select("id, status")
-    .eq("idempotency_key", body.idempotencyKey)
+    .eq("idempotency_key", body.idempotencyKey!)
     .maybeSingle();
 
   if (existing) {
@@ -121,23 +88,27 @@ async function processIntent(supabase: any, userId: string, body: any) {
     });
   }
 
-  const payloadHash = computePayloadHash(body.destinationKind, body.destinationChannelId, body.proposedText);
+  const payloadHash = computePayloadHash(
+    body.destinationKind!,
+    body.destinationChannelId!,
+    body.proposedText!,
+  );
 
   // Insert crossing
   const { data: crossing, error: insertErr } = await supabase.from("crossings").insert({
     auth0_user_sub: userId,
     origin_type: body.originType || "companion",
     companion_id: body.companionId || null,
-    idempotency_key: body.idempotencyKey,
+    idempotency_key: body.idempotencyKey!,
     demo_scenario_key: body.demoScenarioKey || null,
-    source_kind: body.sourceKind,
-    source_repo_owner: body.sourceRepoOwner,
-    source_repo_name: body.sourceRepoName,
-    source_issue_number: body.sourceIssueNumber,
-    destination_kind: body.destinationKind,
-    destination_channel_id: body.destinationChannelId,
-    destination_channel_label: body.destinationChannelLabel,
-    proposed_text: body.proposedText,
+    source_kind: body.sourceKind!,
+    source_repo_owner: body.sourceRepoOwner!,
+    source_repo_name: body.sourceRepoName!,
+    source_issue_number: body.sourceIssueNumber!,
+    destination_kind: body.destinationKind!,
+    destination_channel_id: body.destinationChannelId!,
+    destination_channel_label: body.destinationChannelLabel!,
+    proposed_text: body.proposedText!,
     proposed_payload_hash: payloadHash,
     status: "received",
     read_check_status: "pending",
@@ -197,7 +168,19 @@ async function processIntent(supabase: any, userId: string, body: any) {
   });
 
   // Policy evaluation
-  const policy = evaluatePolicy(body);
+  const policy = evaluatePolicy(
+    {
+      sourceKind: body.sourceKind!,
+      destinationKind: body.destinationKind!,
+      destinationChannelId: body.destinationChannelId!,
+      destinationChannelLabel: body.destinationChannelLabel!,
+      proposedText: body.proposedText!,
+    },
+    {
+      allowedChannelId: Deno.env.get("AIRLOCK_ALLOWED_SLACK_CHANNEL_ID") || "C0123INCIDENTS",
+      maxMessageLength: parseInt(Deno.env.get("AIRLOCK_MAX_MESSAGE_LENGTH") || "2000", 10),
+    },
+  );
 
   if (policy.result === "block") {
     await supabase.from("crossings").update({

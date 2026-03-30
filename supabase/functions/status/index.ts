@@ -1,28 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  isCompanionOnline,
+  resolveStatusUserFromAuthHeader,
+} from "../_shared/airlock.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-airlock-companion-secret",
 };
-
-const DEMO_USER_ID = "demo-user-00000000-0000-0000-0000-000000000000";
-
-async function resolveUserId(req: Request, supabase: any): Promise<{ userId: string; email: string; displayName: string }> {
-  const authHeader = req.headers.get("Authorization");
-  if (authHeader) {
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-    if (!error && user) {
-      return {
-        userId: user.id,
-        email: user.email || "user@airlock.dev",
-        displayName: user.user_metadata?.display_name || user.email || "Operator",
-      };
-    }
-  }
-  return { userId: DEMO_USER_ID, email: "operator@airlock.dev", displayName: "Demo Operator" };
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -35,7 +21,10 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { userId, email, displayName } = await resolveUserId(req, supabase);
+    const { userId, email, displayName } = await resolveStatusUserFromAuthHeader(
+      supabase,
+      req.headers.get("Authorization"),
+    );
 
     // Check companion heartbeat (within last 60s)
     const { data: heartbeat } = await supabase
@@ -46,9 +35,7 @@ serve(async (req) => {
       .limit(1)
       .maybeSingle();
 
-    const companionOnline = heartbeat
-      ? (Date.now() - new Date(heartbeat.last_seen_at).getTime()) < 60000
-      : false;
+    const companionOnline = isCompanionOnline(heartbeat?.last_seen_at);
 
     const status = {
       github: { connected: true, username: email.split("@")[0] },

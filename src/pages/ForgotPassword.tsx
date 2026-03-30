@@ -23,8 +23,8 @@ export default function ForgotPasswordPage() {
       });
       if (error) throw error;
       setSent(true);
-    } catch (err: any) {
-      setError(err.message || 'Failed to send reset email');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to send reset email');
     } finally {
       setSubmitting(false);
     }

@@ -1,33 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  computePayloadHash,
+  resolveUserIdFromAuthHeader,
+} from "../_shared/airlock.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-const DEMO_USER_ID = "demo-user-00000000-0000-0000-0000-000000000000";
-
-function computePayloadHash(destinationKind: string, channelId: string, text: string): string {
-  const input = `${destinationKind}|${channelId}|${text}`;
-  let hash = 0;
-  for (let i = 0; i < input.length; i++) {
-    const char = input.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return `sha256:${Math.abs(hash).toString(16).padStart(8, "0")}`;
-}
-
-async function resolveUserId(req: Request, supabase: any): Promise<string> {
-  const authHeader = req.headers.get("Authorization");
-  if (authHeader) {
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-    if (!error && user) return user.id;
-  }
-  return DEMO_USER_ID;
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -45,7 +26,10 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const userId = await resolveUserId(req, supabase);
+    const userId = await resolveUserIdFromAuthHeader(
+      supabase,
+      req.headers.get("Authorization"),
+    );
 
     const url = new URL(req.url);
     const action = url.searchParams.get("action");
@@ -53,7 +37,7 @@ serve(async (req) => {
     if (action === "reset") {
       const { data: crossings } = await supabase.from("crossings").select("id").eq("auth0_user_sub", userId);
       if (crossings && crossings.length > 0) {
-        const ids = crossings.map((c: any) => c.id);
+        const ids = crossings.map((crossing: { id: string }) => crossing.id);
         await supabase.from("crossing_events").delete().in("crossing_id", ids);
         await supabase.from("crossings").delete().eq("auth0_user_sub", userId);
       }

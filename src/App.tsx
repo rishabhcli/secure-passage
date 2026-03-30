@@ -16,7 +16,20 @@ import Connect from "./pages/Connect";
 import Demo from "./pages/Demo";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+export function createAppQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+      mutations: {
+        retry: false,
+      },
+    },
+  });
+}
+
+const queryClient = createAppQueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

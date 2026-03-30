@@ -8,9 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+coverage
 dist
 dist-ssr
 *.local
+playwright-report
+supabase/.temp
+test-results
 
 # Editor directories and files
 .vscode/*

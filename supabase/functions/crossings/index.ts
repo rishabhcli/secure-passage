@@ -1,22 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveUserIdFromAuthHeader } from "../_shared/airlock.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-airlock-companion-secret",
 };
-
-const DEMO_USER_ID = "demo-user-00000000-0000-0000-0000-000000000000";
-
-async function resolveUserId(req: Request, supabase: any): Promise<string> {
-  const authHeader = req.headers.get("Authorization");
-  if (authHeader) {
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-    if (!error && user) return user.id;
-  }
-  return DEMO_USER_ID;
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -30,7 +19,10 @@ serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const userId = await resolveUserId(req, supabase);
+    const userId = await resolveUserIdFromAuthHeader(
+      supabase,
+      req.headers.get("Authorization"),
+    );
 
     const action = url.searchParams.get("action");
     const crossingId = url.searchParams.get("id");
@@ -89,7 +81,7 @@ serve(async (req) => {
 
     // APPROVE AND SEND
     if (req.method === "POST" && action === "approve-send" && crossingId) {
-      const body = await req.json();
+      const body = (await req.json()) as { approvedPayloadHash?: string };
       const approvedPayloadHash = body.approvedPayloadHash;
 
       if (!approvedPayloadHash) {

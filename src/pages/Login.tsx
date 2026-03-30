@@ -42,8 +42,8 @@ export default function LoginPage() {
         if (error) throw error;
         navigate('/airlock');
       }
-    } catch (err: any) {
-      setError(err.message || 'Authentication failed');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Authentication failed');
     } finally {
       setSubmitting(false);
     }
@@ -98,6 +98,7 @@ export default function LoginPage() {
                 />
                 <button
                   type="button"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >

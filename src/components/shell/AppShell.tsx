@@ -64,6 +64,8 @@ export function AppShell({ children, user: userProp }: AppShellProps) {
                     <span className="font-mono text-[11px]">{displayUser.displayName || displayUser.email}</span>
                   </div>
                   <button
+                    type="button"
+                    aria-label="Sign out"
                     onClick={signOut}
                     className="rounded p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all border border-transparent hover:border-destructive/20"
                     title="Sign out"

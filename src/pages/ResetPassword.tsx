@@ -36,8 +36,8 @@ export default function ResetPasswordPage() {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       navigate('/airlock');
-    } catch (err: any) {
-      setError(err.message || 'Failed to update password');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to update password');
     } finally {
       setSubmitting(false);
     }

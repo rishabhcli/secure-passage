@@ -126,7 +126,12 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
           <h2 className="font-display text-[11px] font-semibold tracking-widest uppercase text-muted-foreground">Review</h2>
           <span className="text-[10px] font-mono text-muted-foreground/50">{crossing.id.slice(0, 8)}</span>
         </div>
-        <button onClick={onClose} className="rounded p-1 hover:bg-accent transition-colors">
+        <button
+          type="button"
+          aria-label="Close review drawer"
+          onClick={onClose}
+          className="rounded p-1 hover:bg-accent transition-colors"
+        >
           <X className="h-4 w-4 text-muted-foreground" />
         </button>
       </div>
@@ -197,7 +202,13 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
               <div className="payload-frame leading-relaxed whitespace-pre-wrap break-words max-h-40 overflow-y-auto text-[12px]">
                 {crossing.proposed_text}
               </div>
-              <button onClick={handleCopy} className="absolute top-2 right-2 rounded p-1 bg-secondary/80 hover:bg-secondary transition-colors border border-border" title="Copy">
+              <button
+                type="button"
+                aria-label="Copy payload"
+                onClick={handleCopy}
+                className="absolute top-2 right-2 rounded p-1 bg-secondary/80 hover:bg-secondary transition-colors border border-border"
+                title="Copy"
+              >
                 {copied ? <CheckCircle2 className="h-3 w-3 text-verified" /> : <Copy className="h-3 w-3 text-muted-foreground" />}
               </button>
             </div>
