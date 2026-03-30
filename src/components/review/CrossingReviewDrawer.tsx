@@ -228,6 +228,6 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
