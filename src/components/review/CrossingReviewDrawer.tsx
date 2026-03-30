@@ -52,6 +52,25 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
   const isSent = crossing.status === 'sent';
   const isSending = approveMutation.isPending;
 
+  // Keyboard shortcuts: Cmd/Ctrl+Enter = approve, Cmd/Ctrl+Backspace = deny, Escape = close
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      } else if (mod && e.key === 'Enter' && isReviewable && !isSending) {
+        e.preventDefault();
+        handleApprove();
+      } else if (mod && e.key === 'Backspace' && isReviewable && !denyMutation.isPending) {
+        e.preventDefault();
+        handleDeny();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [isReviewable, isSending, denyMutation.isPending, crossing]);
+
   const handleCopy = () => {
     navigator.clipboard.writeText(crossing.proposed_text);
     setCopied(true);
