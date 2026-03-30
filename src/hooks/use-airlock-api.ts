@@ -44,7 +44,7 @@ export function useStatusQuery() {
   return useQuery<StatusResponse>({
     queryKey: ['status'],
     queryFn: () => callFunction('status'),
-    refetchInterval: 8000,
+    refetchInterval: 30000, // Light polling as fallback only
     retry: 1,
   });
 }
