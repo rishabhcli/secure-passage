@@ -2,14 +2,21 @@ import { ReactNode } from 'react';
 import { Shield, LogOut, User } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
 
 interface AppShellProps {
   children: ReactNode;
   user?: { displayName?: string; email?: string } | null;
 }
 
-export function AppShell({ children, user }: AppShellProps) {
+export function AppShell({ children, user: userProp }: AppShellProps) {
   const location = useLocation();
+  const { user: authUser, signOut } = useAuth();
+
+  // Prefer auth user over prop
+  const displayUser = authUser
+    ? { displayName: authUser.user_metadata?.display_name || authUser.email, email: authUser.email }
+    : userProp;
 
   const navLinks = [
     { href: '/airlock', label: 'Dashboard' },
@@ -45,13 +52,17 @@ export function AppShell({ children, user }: AppShellProps) {
                 ))}
               </nav>
             </div>
-            {user && (
+            {displayUser && (
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
                   <User className="h-3.5 w-3.5" />
-                  <span>{user.displayName || user.email}</span>
+                  <span>{displayUser.displayName || displayUser.email}</span>
                 </div>
-                <button className="rounded-md p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                <button
+                  onClick={signOut}
+                  className="rounded-md p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                  title="Sign out"
+                >
                   <LogOut className="h-4 w-4" />
                 </button>
               </div>
