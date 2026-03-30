@@ -44,7 +44,7 @@ export function useStatusQuery() {
   return useQuery<StatusResponse>({
     queryKey: ['status'],
     queryFn: () => callFunction('status'),
-    refetchInterval: 8000,
+    refetchInterval: 30000, // Light polling as fallback only
     retry: 1,
   });
 }
@@ -56,7 +56,7 @@ export function useCrossingsQuery(mode?: 'pending' | 'receipts') {
     queryFn: () => callFunction('crossings', {
       params: mode ? { mode } : {},
     }),
-    refetchInterval: 3000,
+    // No polling — realtime handles updates
     retry: 1,
   });
 }
