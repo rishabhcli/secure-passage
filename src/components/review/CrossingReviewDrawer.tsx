@@ -1,32 +1,85 @@
 import { StatusBadge } from '@/components/status/StatusBadge';
 import { Button } from '@/components/ui/button';
-import { MOCK_CROSSINGS, MOCK_EVENTS } from '@/lib/mock-data';
+import { useCrossingDetailQuery, useApproveSendMutation, useDenyCrossingMutation } from '@/hooks/use-airlock-api';
+import { MOCK_CROSSINGS } from '@/lib/mock-data';
 import { X, ExternalLink, Shield, Send, Ban, CheckCircle2, Copy, Hash } from 'lucide-react';
 import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 interface CrossingReviewDrawerProps {
   crossingId: string | null;
   onClose: () => void;
   onApprove?: (id: string) => void;
   onDeny?: (id: string) => void;
-  isSending?: boolean;
 }
 
-export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny, isSending }: CrossingReviewDrawerProps) {
+export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }: CrossingReviewDrawerProps) {
   const [copied, setCopied] = useState(false);
-  const crossing = MOCK_CROSSINGS.find(c => c.id === crossingId);
+  const { toast } = useToast();
+  const { data: detail, isLoading } = useCrossingDetailQuery(crossingId);
+  const approveMutation = useApproveSendMutation();
+  const denyMutation = useDenyCrossingMutation();
 
-  if (!crossingId || !crossing) return null;
+  // Use API data, fallback to mock
+  const crossing = detail?.crossing || MOCK_CROSSINGS.find(c => c.id === crossingId);
+
+  if (!crossingId || (!crossing && !isLoading)) return null;
+
+  if (isLoading || !crossing) {
+    return (
+      <div className="fixed inset-y-0 right-0 z-50 w-full max-w-lg border-l border-border bg-background shadow-2xl overflow-y-auto">
+        <div className="px-5 py-5 space-y-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="rounded-lg border border-border bg-card p-4 animate-pulse">
+              <div className="h-4 w-32 bg-muted rounded mb-3" />
+              <div className="h-3 w-full bg-muted rounded mb-2" />
+              <div className="h-3 w-2/3 bg-muted rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const isReviewable = crossing.status === 'ready_for_review';
   const isBlocked = crossing.status === 'blocked_pre_review';
   const isSent = crossing.status === 'sent';
+  const isSending = approveMutation.isPending;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(crossing.proposed_text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const handleApprove = () => {
+    approveMutation.mutate(
+      { crossingId: crossing.id, approvedPayloadHash: crossing.proposed_payload_hash },
+      {
+        onSuccess: () => {
+          toast({ title: 'Message sent', description: 'Crossing approved and sent through connected Slack account.' });
+          onApprove?.(crossing.id);
+        },
+        onError: (err) => {
+          toast({ title: 'Send failed', description: err.message, variant: 'destructive' });
+        },
+      }
+    );
+  };
+
+  const handleDeny = () => {
+    denyMutation.mutate(crossing.id, {
+      onSuccess: () => {
+        toast({ title: 'Crossing denied', description: 'The crossing has been denied.' });
+        onDeny?.(crossing.id);
+      },
+      onError: (err) => {
+        toast({ title: 'Deny failed', description: err.message, variant: 'destructive' });
+      },
+    });
+  };
+
+  const sourceLabels: string[] = Array.isArray(crossing.source_labels) ? crossing.source_labels : [];
 
   return (
     <div className="fixed inset-y-0 right-0 z-50 w-full max-w-lg border-l border-border bg-background shadow-2xl overflow-y-auto">
@@ -48,7 +101,7 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny, i
             variant={isReviewable ? 'awaiting' : isBlocked ? 'blocked' : isSent ? 'sent' : 'pending'}
             label={crossing.status.replace(/_/g, ' ')}
           />
-          <span className="text-xs text-muted-foreground font-mono">{crossing.id}</span>
+          <span className="text-xs text-muted-foreground font-mono">{crossing.id.slice(0, 8)}</span>
         </div>
 
         {/* Verified Source */}
@@ -74,9 +127,9 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny, i
                 {crossing.source_excerpt}
               </p>
             )}
-            {crossing.source_labels && crossing.source_labels.length > 0 && (
+            {sourceLabels.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
-                {crossing.source_labels.map(label => (
+                {sourceLabels.map((label: string) => (
                   <span key={label} className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-mono text-secondary-foreground">
                     <Hash className="h-2.5 w-2.5" />
                     {label}
@@ -102,21 +155,14 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny, i
               <Send className="h-3.5 w-3.5" />
               <span>Slack → <span className="font-mono text-foreground">{crossing.destination_channel_label}</span></span>
             </div>
-
-            {/* THE PAYLOAD — most important visual element */}
             <div className="relative">
               <div className="payload-frame leading-relaxed whitespace-pre-wrap break-words max-h-48 overflow-y-auto">
                 {crossing.proposed_text}
               </div>
-              <button
-                onClick={handleCopy}
-                className="absolute top-2 right-2 rounded p-1 bg-secondary/80 hover:bg-secondary transition-colors"
-                title="Copy payload"
-              >
+              <button onClick={handleCopy} className="absolute top-2 right-2 rounded p-1 bg-secondary/80 hover:bg-secondary transition-colors" title="Copy payload">
                 {copied ? <CheckCircle2 className="h-3.5 w-3.5 text-verified" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
               </button>
             </div>
-
             <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono">
               <span>{crossing.proposed_text.length} chars</span>
               <span>hash: {crossing.proposed_payload_hash}</span>
@@ -132,9 +178,6 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny, i
               <div>
                 <p className="text-sm font-medium text-destructive">Policy Blocked</p>
                 <p className="text-xs text-destructive/80 mt-1">{crossing.policy_reason_text}</p>
-                {crossing.policy_reason_code && (
-                  <p className="text-[10px] font-mono text-destructive/60 mt-1">{crossing.policy_reason_code}</p>
-                )}
               </div>
             </div>
           </section>
@@ -167,19 +210,11 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny, i
             Approving will execute this message through your connected Slack account.
           </p>
           <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => onDeny?.(crossing.id)}
-            >
+            <Button variant="outline" className="flex-1" onClick={handleDeny} disabled={denyMutation.isPending}>
               <Ban className="h-4 w-4 mr-2" />
               Deny
             </Button>
-            <Button
-              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
-              onClick={() => onApprove?.(crossing.id)}
-              disabled={isSending}
-            >
+            <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleApprove} disabled={isSending}>
               <Send className="h-4 w-4 mr-2" />
               {isSending ? 'Sending...' : 'Approve & Send'}
             </Button>

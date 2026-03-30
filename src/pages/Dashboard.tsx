@@ -4,36 +4,31 @@ import { ReadinessStrip } from '@/components/status/ReadinessStrip';
 import { CrossingCard } from '@/components/crossings/CrossingCard';
 import { ReceiptCard } from '@/components/receipts/ReceiptCard';
 import { CrossingReviewDrawer } from '@/components/review/CrossingReviewDrawer';
-import { MOCK_STATUS, MOCK_CROSSINGS } from '@/lib/mock-data';
+import { useStatusQuery, useCrossingsQuery } from '@/hooks/use-airlock-api';
 import { useNavigate } from 'react-router-dom';
 import { Inbox, FileCheck } from 'lucide-react';
+import { MOCK_STATUS, MOCK_CROSSINGS } from '@/lib/mock-data';
 
 export default function DashboardPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [isSending, setIsSending] = useState(false);
   const navigate = useNavigate();
 
-  const pending = MOCK_CROSSINGS.filter(c =>
+  const { data: status, isLoading: statusLoading } = useStatusQuery();
+  const { data: allCrossings, isLoading: crossingsLoading } = useCrossingsQuery();
+
+  // Use real data if available, fallback to mock
+  const effectiveStatus = status || MOCK_STATUS;
+  const crossings = allCrossings || MOCK_CROSSINGS;
+
+  const pending = crossings.filter(c =>
     ['received', 'verifying_source', 'ready_for_review'].includes(c.status)
   );
-  const receipts = MOCK_CROSSINGS.filter(c =>
+  const receipts = crossings.filter(c =>
     ['sent', 'blocked_pre_review', 'denied', 'failed'].includes(c.status)
   );
 
-  const handleApprove = (id: string) => {
-    setIsSending(true);
-    setTimeout(() => {
-      setIsSending(false);
-      setSelectedId(null);
-    }, 1500);
-  };
-
-  const handleDeny = (id: string) => {
-    setSelectedId(null);
-  };
-
   return (
-    <AppShell user={MOCK_STATUS.user}>
+    <AppShell user={effectiveStatus.user}>
       {/* Header */}
       <div className="mb-6">
         <p className="text-xs text-muted-foreground font-mono">
@@ -43,7 +38,7 @@ export default function DashboardPage() {
 
       {/* Readiness Strip */}
       <div className="mb-6">
-        <ReadinessStrip status={MOCK_STATUS} />
+        <ReadinessStrip status={effectiveStatus} isLoading={statusLoading} />
       </div>
 
       {/* Main Grid */}
@@ -65,12 +60,22 @@ export default function DashboardPage() {
             Actions proposed by your local companion
           </p>
 
-          {pending.length === 0 ? (
+          {crossingsLoading ? (
+            <div className="space-y-2">
+              {[1, 2].map(i => (
+                <div key={i} className="rounded-lg border border-border bg-card p-4 animate-pulse">
+                  <div className="h-4 w-48 bg-muted rounded mb-3" />
+                  <div className="h-3 w-32 bg-muted rounded mb-2" />
+                  <div className="h-3 w-24 bg-muted rounded" />
+                </div>
+              ))}
+            </div>
+          ) : pending.length === 0 ? (
             <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
               <Inbox className="h-8 w-8 text-muted-foreground/30 mx-auto mb-3" />
               <p className="text-sm text-muted-foreground">No pending crossings</p>
               <p className="text-xs text-muted-foreground/60 mt-1">
-                Your local companion can emit new crossing intents
+                Use the Demo page to seed crossing scenarios
               </p>
             </div>
           ) : (
@@ -125,9 +130,8 @@ export default function DashboardPage() {
           <CrossingReviewDrawer
             crossingId={selectedId}
             onClose={() => setSelectedId(null)}
-            onApprove={handleApprove}
-            onDeny={handleDeny}
-            isSending={isSending}
+            onApprove={() => setSelectedId(null)}
+            onDeny={() => setSelectedId(null)}
           />
         </>
       )}
