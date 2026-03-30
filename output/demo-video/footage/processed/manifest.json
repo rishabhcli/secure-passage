@@ -1,0 +1,181 @@
+{
+  "processedAt": "2026-03-30T20:14:41.813Z",
+  "shots": [
+    {
+      "id": "landing_hook",
+      "label": "Landing hook",
+      "idealPaddingSec": 2.8,
+      "zoom": [
+        1,
+        1.03
+      ],
+      "videoPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/raw/landing_hook.webm",
+      "stillPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/stills/landing_hook.png",
+      "description": "Reused existing capture",
+      "outputPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/processed/landing_hook.mp4",
+      "publicPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/public/demo-video-assets/footage/landing_hook.mp4",
+      "staticPath": "demo-video-assets/footage/landing_hook.mp4",
+      "durationSec": 8.84
+    },
+    {
+      "id": "dashboard_intro",
+      "label": "Dashboard intro",
+      "idealPaddingSec": 3.4,
+      "zoom": [
+        1.01,
+        1.05
+      ],
+      "videoPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/raw/dashboard_intro.webm",
+      "stillPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/stills/dashboard_intro.png",
+      "description": "Reused existing capture",
+      "outputPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/processed/dashboard_intro.mp4",
+      "publicPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/public/demo-video-assets/footage/dashboard_intro.mp4",
+      "staticPath": "demo-video-assets/footage/dashboard_intro.mp4",
+      "durationSec": 19.52
+    },
+    {
+      "id": "review_drawer",
+      "label": "Review drawer",
+      "idealPaddingSec": 3.1,
+      "zoom": [
+        1,
+        1.025
+      ],
+      "videoPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/raw/review_drawer.webm",
+      "stillPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/stills/review_drawer.png",
+      "description": "Reused existing capture",
+      "outputPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/processed/review_drawer.mp4",
+      "publicPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/public/demo-video-assets/footage/review_drawer.mp4",
+      "staticPath": "demo-video-assets/footage/review_drawer.mp4",
+      "durationSec": 23.76
+    },
+    {
+      "id": "detail_page",
+      "label": "Detail page",
+      "idealPaddingSec": 4.2,
+      "zoom": [
+        1.01,
+        1.04
+      ],
+      "videoPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/raw/detail_page.webm",
+      "stillPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/stills/detail_page.png",
+      "description": "Reused existing capture",
+      "outputPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/processed/detail_page.mp4",
+      "publicPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/public/demo-video-assets/footage/detail_page.mp4",
+      "staticPath": "demo-video-assets/footage/detail_page.mp4",
+      "durationSec": 30.36
+    },
+    {
+      "id": "demo_seed",
+      "label": "Demo seed controls",
+      "idealPaddingSec": 2.6,
+      "zoom": [
+        1,
+        1.02
+      ],
+      "videoPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/raw/demo_seed.webm",
+      "stillPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/stills/demo_seed.png",
+      "description": "Reused existing capture",
+      "outputPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/processed/demo_seed.mp4",
+      "publicPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/public/demo-video-assets/footage/demo_seed.mp4",
+      "staticPath": "demo-video-assets/footage/demo_seed.mp4",
+      "durationSec": 23.6
+    },
+    {
+      "id": "approve_send",
+      "label": "Approve and send",
+      "idealPaddingSec": 2.8,
+      "zoom": [
+        1,
+        1.03
+      ],
+      "videoPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/raw/approve_send.webm",
+      "stillPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/stills/approve_send.png",
+      "description": "Approve crossing and show receipt state",
+      "outputPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/processed/approve_send.mp4",
+      "publicPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/public/demo-video-assets/footage/approve_send.mp4",
+      "staticPath": "demo-video-assets/footage/approve_send.mp4",
+      "durationSec": 17.96
+    },
+    {
+      "id": "sent_detail",
+      "label": "Sent detail",
+      "idealPaddingSec": 2.7,
+      "zoom": [
+        1.01,
+        1.035
+      ],
+      "videoPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/raw/sent_detail.webm",
+      "stillPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/stills/sent_detail.png",
+      "description": "Sent detail receipt page",
+      "outputPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/processed/sent_detail.mp4",
+      "publicPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/public/demo-video-assets/footage/sent_detail.mp4",
+      "staticPath": "demo-video-assets/footage/sent_detail.mp4",
+      "durationSec": 16.84
+    },
+    {
+      "id": "blocked_detail",
+      "label": "Blocked detail",
+      "idealPaddingSec": 3.4,
+      "zoom": [
+        1.01,
+        1.04
+      ],
+      "videoPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/raw/blocked_detail.webm",
+      "stillPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/stills/blocked_detail.png",
+      "description": "Blocked detail page with policy reason",
+      "outputPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/processed/blocked_detail.mp4",
+      "publicPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/public/demo-video-assets/footage/blocked_detail.mp4",
+      "staticPath": "demo-video-assets/footage/blocked_detail.mp4",
+      "durationSec": 23
+    },
+    {
+      "id": "heartbeat_ops",
+      "label": "Heartbeat and ops",
+      "idealPaddingSec": 3,
+      "zoom": [
+        1,
+        1.025
+      ],
+      "videoPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/raw/heartbeat_ops.webm",
+      "stillPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/stills/heartbeat_ops.png",
+      "description": "Demo heartbeat and refreshed online state",
+      "outputPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/processed/heartbeat_ops.mp4",
+      "publicPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/public/demo-video-assets/footage/heartbeat_ops.mp4",
+      "staticPath": "demo-video-assets/footage/heartbeat_ops.mp4",
+      "durationSec": 16.84
+    },
+    {
+      "id": "connections_architecture",
+      "label": "Connections",
+      "idealPaddingSec": 3.1,
+      "zoom": [
+        1,
+        1.02
+      ],
+      "videoPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/raw/connections_architecture.webm",
+      "stillPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/stills/connections_architecture.png",
+      "description": "Connections overview",
+      "outputPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/processed/connections_architecture.mp4",
+      "publicPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/public/demo-video-assets/footage/connections_architecture.mp4",
+      "staticPath": "demo-video-assets/footage/connections_architecture.mp4",
+      "durationSec": 16.2
+    },
+    {
+      "id": "closing_payoff",
+      "label": "Closing payoff",
+      "idealPaddingSec": 3.8,
+      "zoom": [
+        1.01,
+        1.05
+      ],
+      "videoPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/raw/closing_payoff.webm",
+      "stillPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/stills/closing_payoff.png",
+      "description": "Closing dashboard with sent and blocked receipts",
+      "outputPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/output/demo-video/footage/processed/closing_payoff.mp4",
+      "publicPath": "/Users/rishabhbansal/Documents/GitHub/secure-passage/public/demo-video-assets/footage/closing_payoff.mp4",
+      "staticPath": "demo-video-assets/footage/closing_payoff.mp4",
+      "durationSec": 26.56
+    }
+  ]
+}

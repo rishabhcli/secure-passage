@@ -1,0 +1,204 @@
+{
+  "generatedAt": "2026-03-30T20:14:55.157Z",
+  "totalDurationSec": 286.85,
+  "shots": [
+    {
+      "id": "landing_hook",
+      "label": "Landing hook",
+      "callout": "The agent proposes. You decide.",
+      "narrationText": "This message does not get to Slack just because an agent asked for it. AIRLOCK stops it at the border, checks where it came from, checks where it is going, and then puts a human in the loop before anything crosses over.",
+      "startSec": 0,
+      "displayDurationSec": 16,
+      "clipDurationSec": 8.84,
+      "holdAfterSec": 7.16,
+      "zoom": [
+        1,
+        1.03
+      ],
+      "video": "demo-video-assets/footage/landing_hook.mp4",
+      "still": "demo-video-assets/stills/landing_hook.png",
+      "audio": "demo-video-assets/audio/01-landing_hook.wav",
+      "audioDurationSec": 12.9
+    },
+    {
+      "id": "dashboard_intro",
+      "label": "Dashboard intro",
+      "callout": "A visible checkpoint",
+      "narrationText": "This is AIRLOCK’s control panel. The local companion can propose work, but the control plane decides whether that work is reviewable, blocked, or ready to send. On one screen, you can see system readiness, the queue of pending crossings, and the receipts that prove what already happened. That makes the product legible right away: this is not hidden agent behavior. It is supervised agent behavior.",
+      "startSec": 16,
+      "displayDurationSec": 28.349999999999998,
+      "clipDurationSec": 19.52,
+      "holdAfterSec": 8.829999999999998,
+      "zoom": [
+        1.01,
+        1.05
+      ],
+      "video": "demo-video-assets/footage/dashboard_intro.mp4",
+      "still": "demo-video-assets/stills/dashboard_intro.png",
+      "audio": "demo-video-assets/audio/02-dashboard_intro.wav",
+      "audioDurationSec": 24.65
+    },
+    {
+      "id": "review_drawer",
+      "label": "Review drawer",
+      "callout": "Human review before action",
+      "narrationText": "Here is the first moment that feels different from a normal AI workflow. The operator opens a pending crossing and gets the exact source, the intended destination, the full outbound message, and the companion’s rationale. You are not approving a fuzzy idea. You are approving a specific action with a specific payload.",
+      "startSec": 44.349999999999994,
+      "displayDurationSec": 23.700000000000003,
+      "clipDurationSec": 23.700000000000003,
+      "holdAfterSec": 0,
+      "zoom": [
+        1,
+        1.025
+      ],
+      "video": "demo-video-assets/footage/review_drawer.mp4",
+      "still": "demo-video-assets/stills/review_drawer.png",
+      "audio": "demo-video-assets/audio/03-review_drawer.wav",
+      "audioDurationSec": 20.3
+    },
+    {
+      "id": "detail_page",
+      "label": "Detail page",
+      "callout": "Evidence, payload, receipts",
+      "narrationText": "On the detail page, AIRLOCK slows the whole thing down in a good way. You can inspect the GitHub issue that triggered the crossing, read the excerpt that was verified, confirm the Slack destination, and compare that with the exact text that would be posted. It even keeps the payload hash and a timeline of events, so this becomes an auditable record instead of a blind trust exercise. If an operator needs to explain why a message was approved later, this page already has most of the answer.",
+      "startSec": 68.05,
+      "displayDurationSec": 30.825,
+      "clipDurationSec": 30.36,
+      "holdAfterSec": 0.46499999999999986,
+      "zoom": [
+        1.01,
+        1.04
+      ],
+      "video": "demo-video-assets/footage/detail_page.mp4",
+      "still": "demo-video-assets/stills/detail_page.png",
+      "audio": "demo-video-assets/audio/04-detail_page.wav",
+      "audioDurationSec": 26.325
+    },
+    {
+      "id": "demo_seed",
+      "label": "Demo seed controls",
+      "callout": "Deterministic demo controls",
+      "narrationText": "For the demo environment, AIRLOCK also includes operator controls to reset state and seed clean scenarios. That matters because it lets us show the same high-signal flows every time, without hand-editing data or hoping a live provider happens to return the right example on cue.",
+      "startSec": 98.875,
+      "displayDurationSec": 21.900000000000002,
+      "clipDurationSec": 21.900000000000002,
+      "holdAfterSec": 0,
+      "zoom": [
+        1,
+        1.02
+      ],
+      "video": "demo-video-assets/footage/demo_seed.mp4",
+      "still": "demo-video-assets/stills/demo_seed.png",
+      "audio": "demo-video-assets/audio/05-demo_seed.wav",
+      "audioDurationSec": 19
+    },
+    {
+      "id": "approve_send",
+      "label": "Approve and send",
+      "callout": "Approve and execute",
+      "narrationText": "Now the operator approves the crossing. In this demo build, GitHub verification and Slack delivery are intentionally deterministic and mocked, but the control flow is real: AIRLOCK advances the crossing, records the send, and moves the message into receipts so the operator can prove exactly what happened. That is the distinction the demo is trying to make. The provider side is stable on purpose, but the governance path is the real product behavior.",
+      "startSec": 120.775,
+      "displayDurationSec": 30.825000000000003,
+      "clipDurationSec": 17.96,
+      "holdAfterSec": 12.865000000000002,
+      "zoom": [
+        1,
+        1.03
+      ],
+      "video": "demo-video-assets/footage/approve_send.mp4",
+      "still": "demo-video-assets/stills/approve_send.png",
+      "audio": "demo-video-assets/audio/06-approve_send.wav",
+      "audioDurationSec": 27.725
+    },
+    {
+      "id": "sent_detail",
+      "label": "Sent detail",
+      "callout": "A durable receipt",
+      "narrationText": "That receipt is important. AIRLOCK does not just say the action succeeded. It preserves the evidence, the approved payload, the outcome, and the execution metadata in one place. That is the difference between a flashy demo and a system that can actually support governance.",
+      "startSec": 151.60000000000002,
+      "displayDurationSec": 20.175,
+      "clipDurationSec": 16.84,
+      "holdAfterSec": 3.335000000000001,
+      "zoom": [
+        1.01,
+        1.035
+      ],
+      "video": "demo-video-assets/footage/sent_detail.mp4",
+      "still": "demo-video-assets/stills/sent_detail.png",
+      "audio": "demo-video-assets/audio/07-sent_detail.wav",
+      "audioDurationSec": 17.175
+    },
+    {
+      "id": "blocked_detail",
+      "label": "Blocked detail",
+      "callout": "Policy blocks before blast radius",
+      "narrationText": "The blocked path is where the product really proves its point. This issue is valid, but the destination channel is wrong. AIRLOCK catches that before review, explains the policy decision in plain language, and leaves a visible record behind. So the operator sees why the action stopped, and the agent never gets a silent free pass into the wrong system. For a hackathon demo, this is the moment that turns the idea from clever to credible.",
+      "startSec": 171.77500000000003,
+      "displayDurationSec": 30.15,
+      "clipDurationSec": 23,
+      "holdAfterSec": 7.149999999999999,
+      "zoom": [
+        1.01,
+        1.04
+      ],
+      "video": "demo-video-assets/footage/blocked_detail.mp4",
+      "still": "demo-video-assets/stills/blocked_detail.png",
+      "audio": "demo-video-assets/audio/08-blocked_detail.wav",
+      "audioDurationSec": 26.45
+    },
+    {
+      "id": "heartbeat_ops",
+      "label": "Heartbeat and ops",
+      "callout": "Operational companion state",
+      "narrationText": "There is an operational layer too. The demo tools can simulate the local companion heartbeat, which makes the companion state visible to the operator. That small detail is useful, because the control plane is not just reviewing messages. It is also keeping track of whether the companion at the edge is actually online and behaving as expected. In other words, AIRLOCK is watching the pathway and the actor using it.",
+      "startSec": 201.92500000000004,
+      "displayDurationSec": 29.125,
+      "clipDurationSec": 16.84,
+      "holdAfterSec": 12.285,
+      "zoom": [
+        1,
+        1.025
+      ],
+      "video": "demo-video-assets/footage/heartbeat_ops.mp4",
+      "still": "demo-video-assets/stills/heartbeat_ops.png",
+      "audio": "demo-video-assets/audio/09-heartbeat_ops.wav",
+      "audioDurationSec": 25.825
+    },
+    {
+      "id": "connections_architecture",
+      "label": "Connections",
+      "callout": "Read side and write side split",
+      "narrationText": "The connections model is deliberately simple. GitHub is the read side for source verification. Slack is the write side for outbound execution. And the local companion does not need direct access to either one. AIRLOCK sits in the middle as the checkpoint that verifies source, evaluates policy, and mediates the final action.",
+      "startSec": 231.05000000000004,
+      "displayDurationSec": 24.725,
+      "clipDurationSec": 16.2,
+      "holdAfterSec": 8.525000000000002,
+      "zoom": [
+        1,
+        1.02
+      ],
+      "video": "demo-video-assets/footage/connections_architecture.mp4",
+      "still": "demo-video-assets/stills/connections_architecture.png",
+      "audio": "demo-video-assets/audio/10-connections_architecture.wav",
+      "audioDurationSec": 21.325
+    },
+    {
+      "id": "closing_payoff",
+      "label": "Closing payoff",
+      "callout": "Governed AI action",
+      "narrationText": "So the payoff is straightforward. You still get fast AI-assisted action, but now it comes with review gates, policy enforcement, companion awareness, and receipts that make every crossing legible after the fact. The operator stays in control, the system stays auditable, and the agent still moves fast enough to be useful. If you want agents to do real work without giving them unchecked access to external systems, this is the shape of the product.",
+      "startSec": 255.77500000000003,
+      "displayDurationSec": 31.075000000000003,
+      "clipDurationSec": 26.56,
+      "holdAfterSec": 4.515000000000004,
+      "zoom": [
+        1.01,
+        1.05
+      ],
+      "video": "demo-video-assets/footage/closing_payoff.mp4",
+      "still": "demo-video-assets/stills/closing_payoff.png",
+      "audio": "demo-video-assets/audio/11-closing_payoff.wav",
+      "audioDurationSec": 26.975
+    }
+  ]
+}
