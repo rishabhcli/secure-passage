@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils';
 import { CrossingListItem, CrossingStatus } from '@/types/airlock';
 import { StatusBadge } from '@/components/status/StatusBadge';
 import { ArrowRight, GitBranch } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 function getStatusVariant(status: CrossingStatus) {
   const map: Record<CrossingStatus, 'pending' | 'verified' | 'awaiting' | 'blocked' | 'sending' | 'sent' | 'denied' | 'failed'> = {
