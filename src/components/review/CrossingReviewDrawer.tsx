@@ -261,6 +261,7 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
             >
               <Ban className="h-3.5 w-3.5 mr-1.5" />
               Deny
+              <kbd className="ml-auto text-[9px] font-mono opacity-50">⌘⌫</kbd>
             </Button>
             <Button
               size="sm"
@@ -270,6 +271,7 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
             >
               <Send className="h-3.5 w-3.5 mr-1.5" />
               {isSending ? 'Sending...' : 'Approve & Send'}
+              <kbd className="ml-auto text-[9px] font-mono opacity-50">⌘↵</kbd>
             </Button>
           </div>
         </div>
