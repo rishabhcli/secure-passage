@@ -5,6 +5,7 @@
 @tailwind utilities;
 
 @layer base {
+  /* ===== DARK MODE (default) ===== */
   :root {
     --background: 225 25% 5%;
     --foreground: 60 10% 88%;
@@ -64,9 +65,66 @@
     --sidebar-border: 225 15% 14%;
     --sidebar-ring: 150 100% 50%;
 
-    /* Grid and scanline effects */
     --grid-color: 225 15% 12%;
     --scanline-opacity: 0.03;
+  }
+
+  /* ===== LIGHT MODE ===== */
+  .light {
+    --background: 210 20% 98%;
+    --foreground: 225 25% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 225 25% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 225 25% 10%;
+
+    --primary: 155 80% 30%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 15% 93%;
+    --secondary-foreground: 225 15% 40%;
+
+    --muted: 210 15% 95%;
+    --muted-foreground: 225 10% 45%;
+
+    --accent: 210 15% 93%;
+    --accent-foreground: 225 25% 15%;
+
+    --destructive: 0 75% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 15% 88%;
+    --input: 210 15% 88%;
+    --ring: 155 80% 30%;
+
+    /* AIRLOCK semantic tokens - light */
+    --verified: 155 80% 30%;
+    --verified-foreground: 0 0% 100%;
+    --awaiting: 38 90% 45%;
+    --awaiting-foreground: 0 0% 100%;
+    --blocked: 0 75% 50%;
+    --blocked-foreground: 0 0% 100%;
+    --sending: 200 85% 45%;
+    --sending-foreground: 0 0% 100%;
+    --offline: 225 10% 60%;
+    --offline-foreground: 225 10% 35%;
+
+    --surface-elevated: 0 0% 100%;
+    --surface-sunken: 210 20% 96%;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 225 25% 10%;
+    --sidebar-primary: 155 80% 30%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 15% 93%;
+    --sidebar-accent-foreground: 225 25% 15%;
+    --sidebar-border: 210 15% 88%;
+    --sidebar-ring: 155 80% 30%;
+
+    --grid-color: 210 15% 90%;
+    --scanline-opacity: 0.015;
   }
 }
 
@@ -103,7 +161,6 @@
     font-family: var(--font-mono);
   }
 
-  /* Subtle grid background for panels */
   .grid-bg {
     background-image:
       linear-gradient(hsl(var(--grid-color) / 0.5) 1px, transparent 1px),
@@ -111,7 +168,6 @@
     background-size: 24px 24px;
   }
 
-  /* Scanline overlay */
   .scanline::after {
     content: '';
     position: absolute;
@@ -126,7 +182,6 @@
     );
   }
 
-  /* Neon border accents */
   .neon-border-top {
     position: relative;
   }
@@ -140,7 +195,6 @@
     background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.6), transparent);
   }
 
-  /* Status indicator pulse */
   .status-pulse {
     animation: status-pulse 2s ease-in-out infinite;
   }
@@ -150,7 +204,6 @@
     50% { opacity: 1; }
   }
 
-  /* Terminal cursor blink */
   .cursor-blink::after {
     content: '▋';
     animation: blink 1s step-end infinite;
@@ -163,7 +216,6 @@
     50% { opacity: 0; }
   }
 
-  /* Dot matrix pattern */
   .dot-matrix {
     background-image: radial-gradient(hsl(var(--grid-color) / 0.8) 1px, transparent 1px);
     background-size: 12px 12px;
