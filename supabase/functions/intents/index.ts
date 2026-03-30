@@ -59,13 +59,14 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Auth: either companion secret or user JWT
+    const DEMO_USER_ID = "demo-user-00000000-0000-0000-0000-000000000000";
+
+    // Auth: companion secret, user JWT, or demo fallback
     const companionSecret = req.headers.get("x-airlock-companion-secret");
     const authHeader = req.headers.get("Authorization");
     let userId: string;
 
     if (companionSecret) {
-      // Companion auth - trust the userId in the body
       const expectedSecret = Deno.env.get("AIRLOCK_COMPANION_SECRET") || "demo-companion-secret";
       if (companionSecret !== expectedSecret) {
         return new Response(JSON.stringify({ error: "Invalid companion secret" }), {
@@ -73,30 +74,21 @@ serve(async (req) => {
         });
       }
       const body = await req.json();
-      userId = body.auth0UserSub;
-      if (!userId) {
-        return new Response(JSON.stringify({ error: "auth0UserSub required" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      userId = body.auth0UserSub || DEMO_USER_ID;
       return await processIntent(supabase, userId, body);
     } else if (authHeader) {
       const token = authHeader.replace("Bearer ", "");
       const { data: { user }, error } = await supabase.auth.getUser(token);
-      if (error || !user) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      userId = user.id;
+      userId = (!error && user) ? user.id : DEMO_USER_ID;
       const body = await req.json();
       body.auth0UserSub = userId;
       return await processIntent(supabase, userId, body);
+    } else {
+      // Demo fallback - no auth required
+      const body = await req.json();
+      userId = body.auth0UserSub || DEMO_USER_ID;
+      return await processIntent(supabase, userId, body);
     }
-
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
   } catch (err) {
     console.error("intents error:", err);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
