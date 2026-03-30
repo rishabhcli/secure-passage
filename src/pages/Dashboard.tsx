@@ -5,6 +5,7 @@ import { CrossingCard } from '@/components/crossings/CrossingCard';
 import { ReceiptCard } from '@/components/receipts/ReceiptCard';
 import { CrossingReviewDrawer } from '@/components/review/CrossingReviewDrawer';
 import { useStatusQuery, useCrossingsQuery } from '@/hooks/use-airlock-api';
+import { useCrossingsRealtime } from '@/hooks/use-crossings-realtime';
 import { useNavigate } from 'react-router-dom';
 import { Inbox, FileCheck } from 'lucide-react';
 import { MOCK_STATUS, MOCK_CROSSINGS } from '@/lib/mock-data';
