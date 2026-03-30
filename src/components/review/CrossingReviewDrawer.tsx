@@ -83,7 +83,13 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
   const sourceLabels: string[] = Array.isArray(crossing.source_labels) ? crossing.source_labels : [];
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-lg border-l border-border bg-background shadow-2xl overflow-y-auto">
+    <motion.div
+      initial={{ x: '100%' }}
+      animate={{ x: 0 }}
+      exit={{ x: '100%' }}
+      transition={{ type: 'spring', stiffness: 350, damping: 35 }}
+      className="fixed inset-y-0 right-0 z-50 w-full max-w-lg border-l border-border bg-background shadow-2xl overflow-y-auto"
+    >
       {/* Header */}
       <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background/95 backdrop-blur px-5 py-4">
         <div className="flex items-center gap-3">
