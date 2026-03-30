@@ -57,7 +57,6 @@ export function AppShell({ children, user: userProp }: AppShellProps) {
               </nav>
             </div>
             <div className="flex items-center gap-2">
-              <ThemeToggle />
               {displayUser && (
                 <>
                   <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground bg-secondary/50 rounded px-2.5 py-1 border border-border">
