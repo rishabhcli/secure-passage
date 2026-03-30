@@ -23,6 +23,58 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
 
   const crossing = detail?.crossing || MOCK_CROSSINGS.find(c => c.id === crossingId);
 
+  const isReviewable = crossing?.status === 'ready_for_review';
+  const isSending = approveMutation.isPending;
+
+  const handleApprove = useCallback(() => {
+    if (!crossing) return;
+    approveMutation.mutate(
+      { crossingId: crossing.id, approvedPayloadHash: crossing.proposed_payload_hash },
+      {
+        onSuccess: () => {
+          toast({ title: 'Message sent', description: 'Crossing approved and sent.' });
+          onApprove?.(crossing.id);
+        },
+        onError: (err) => {
+          toast({ title: 'Send failed', description: err.message, variant: 'destructive' });
+        },
+      }
+    );
+  }, [crossing, approveMutation, toast, onApprove]);
+
+  const handleDeny = useCallback(() => {
+    if (!crossing) return;
+    denyMutation.mutate(crossing.id, {
+      onSuccess: () => {
+        toast({ title: 'Crossing denied', description: 'The crossing has been denied.' });
+        onDeny?.(crossing.id);
+      },
+      onError: (err) => {
+        toast({ title: 'Deny failed', description: err.message, variant: 'destructive' });
+      },
+    });
+  }, [crossing, denyMutation, toast, onDeny]);
+
+  // Keyboard shortcuts: ⌘/Ctrl+Enter = approve, ⌘/Ctrl+Backspace = deny, Escape = close
+  useEffect(() => {
+    if (!crossingId) return;
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      } else if (mod && e.key === 'Enter' && isReviewable && !isSending) {
+        e.preventDefault();
+        handleApprove();
+      } else if (mod && e.key === 'Backspace' && isReviewable && !denyMutation.isPending) {
+        e.preventDefault();
+        handleDeny();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [crossingId, isReviewable, isSending, denyMutation.isPending, handleApprove, handleDeny, onClose]);
+
   if (!crossingId || (!crossing && !isLoading)) return null;
 
   if (isLoading || !crossing) {
@@ -47,29 +99,8 @@ export function CrossingReviewDrawer({ crossingId, onClose, onApprove, onDeny }:
     );
   }
 
-  const isReviewable = crossing.status === 'ready_for_review';
   const isBlocked = crossing.status === 'blocked_pre_review';
   const isSent = crossing.status === 'sent';
-  const isSending = approveMutation.isPending;
-
-  // Keyboard shortcuts: Cmd/Ctrl+Enter = approve, Cmd/Ctrl+Backspace = deny, Escape = close
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const mod = e.metaKey || e.ctrlKey;
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-      } else if (mod && e.key === 'Enter' && isReviewable && !isSending) {
-        e.preventDefault();
-        handleApprove();
-      } else if (mod && e.key === 'Backspace' && isReviewable && !denyMutation.isPending) {
-        e.preventDefault();
-        handleDeny();
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [isReviewable, isSending, denyMutation.isPending, crossing]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(crossing.proposed_text);
