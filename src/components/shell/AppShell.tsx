@@ -9,40 +9,6 @@ interface AppShellProps {
   user?: { displayName?: string; email?: string } | null;
 }
 
-function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-
-  const options: { value: 'light' | 'dark' | 'system'; icon: typeof Sun; label: string }[] = [
-    { value: 'light', icon: Sun, label: 'Light' },
-    { value: 'dark', icon: Moon, label: 'Dark' },
-    { value: 'system', icon: Monitor, label: 'System' },
-  ];
-
-  return (
-    <div className="flex items-center rounded border border-border bg-secondary/30 p-0.5">
-      {options.map(opt => {
-        const Icon = opt.icon;
-        const active = theme === opt.value;
-        return (
-          <button
-            key={opt.value}
-            onClick={() => setTheme(opt.value)}
-            className={cn(
-              'rounded p-1 transition-all',
-              active
-                ? 'bg-primary/15 text-primary'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
-            title={opt.label}
-          >
-            <Icon className="h-3 w-3" />
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 export function AppShell({ children, user: userProp }: AppShellProps) {
   const location = useLocation();
   const { user: authUser, signOut } = useAuth();
