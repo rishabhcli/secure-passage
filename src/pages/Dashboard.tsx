@@ -84,7 +84,7 @@ export default function DashboardPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <AnimatePresence mode="popLayout">
               {pending.map(crossing => (
                 <CrossingCard
                   key={crossing.id}
@@ -93,7 +93,7 @@ export default function DashboardPage() {
                   onClick={() => setSelectedId(crossing.id)}
                 />
               ))}
-            </div>
+            </AnimatePresence>
           )}
         </div>
 
