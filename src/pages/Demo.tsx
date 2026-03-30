@@ -1,41 +1,52 @@
 import { useState } from 'react';
 import { AppShell } from '@/components/shell/AppShell';
-import { MOCK_STATUS } from '@/lib/mock-data';
 import { StatusBadge } from '@/components/status/StatusBadge';
 import { Button } from '@/components/ui/button';
-import { RotateCcw, Plus, Ban, Radio, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { useStatusQuery, useResetDemoMutation, useSeedValidMutation, useSeedBlockedMutation, useSendHeartbeatMutation } from '@/hooks/use-airlock-api';
+import { MOCK_STATUS } from '@/lib/mock-data';
+import { RotateCcw, Plus, Ban, Radio, AlertTriangle, CheckCircle2, Heart } from 'lucide-react';
 
 export default function DemoPage() {
   const [lastAction, setLastAction] = useState<string | null>(null);
-  const [isResetting, setIsResetting] = useState(false);
-  const [isSeeding, setIsSeeding] = useState(false);
+
+  const { data: status } = useStatusQuery();
+  const effectiveStatus = status || MOCK_STATUS;
+
+  const resetMutation = useResetDemoMutation();
+  const seedValidMutation = useSeedValidMutation();
+  const seedBlockedMutation = useSeedBlockedMutation();
+  const heartbeatMutation = useSendHeartbeatMutation();
 
   const handleReset = () => {
-    setIsResetting(true);
-    setTimeout(() => {
-      setIsResetting(false);
-      setLastAction('Demo state reset successfully');
-    }, 1000);
+    resetMutation.mutate(undefined, {
+      onSuccess: () => setLastAction('Demo state reset successfully'),
+      onError: (err) => setLastAction(`Reset failed: ${err.message}`),
+    });
   };
 
   const handleSeedValid = () => {
-    setIsSeeding(true);
-    setTimeout(() => {
-      setIsSeeding(false);
-      setLastAction('Seeded valid crossing: valid_issue_alert');
-    }, 800);
+    seedValidMutation.mutate(undefined, {
+      onSuccess: (data) => setLastAction(`Seeded valid crossing: ${data.crossingId}`),
+      onError: (err) => setLastAction(`Seed failed: ${err.message}`),
+    });
   };
 
   const handleSeedBlocked = () => {
-    setIsSeeding(true);
-    setTimeout(() => {
-      setIsSeeding(false);
-      setLastAction('Seeded blocked crossing: blocked_wrong_channel');
-    }, 800);
+    seedBlockedMutation.mutate(undefined, {
+      onSuccess: (data) => setLastAction(`Seeded blocked crossing: ${data.crossingId}`),
+      onError: (err) => setLastAction(`Seed failed: ${err.message}`),
+    });
+  };
+
+  const handleHeartbeat = () => {
+    heartbeatMutation.mutate({ companionId: 'companion-local-01' }, {
+      onSuccess: () => setLastAction('Heartbeat sent successfully'),
+      onError: (err) => setLastAction(`Heartbeat failed: ${err.message}`),
+    });
   };
 
   return (
-    <AppShell user={MOCK_STATUS.user}>
+    <AppShell user={effectiveStatus.user}>
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <h1 className="font-display text-lg font-bold tracking-wider uppercase">Demo Controls</h1>
@@ -50,33 +61,22 @@ export default function DemoPage() {
         {/* Scenario Controls */}
         <section className="rounded-lg border border-border bg-card p-5 space-y-4">
           <h2 className="text-xs font-display font-semibold tracking-wider uppercase text-muted-foreground">Scenario Controls</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={handleReset}
-              disabled={isResetting}
-            >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Button variant="outline" className="w-full justify-start" onClick={handleReset} disabled={resetMutation.isPending}>
               <RotateCcw className="h-4 w-4 mr-2" />
-              {isResetting ? 'Resetting...' : 'Reset Demo State'}
+              {resetMutation.isPending ? 'Resetting...' : 'Reset Demo State'}
             </Button>
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={handleSeedValid}
-              disabled={isSeeding}
-            >
+            <Button variant="outline" className="w-full justify-start" onClick={handleSeedValid} disabled={seedValidMutation.isPending}>
               <Plus className="h-4 w-4 mr-2" />
-              Seed Valid Crossing
+              {seedValidMutation.isPending ? 'Seeding...' : 'Seed Valid Crossing'}
             </Button>
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={handleSeedBlocked}
-              disabled={isSeeding}
-            >
+            <Button variant="outline" className="w-full justify-start" onClick={handleSeedBlocked} disabled={seedBlockedMutation.isPending}>
               <Ban className="h-4 w-4 mr-2" />
-              Seed Blocked Crossing
+              {seedBlockedMutation.isPending ? 'Seeding...' : 'Seed Blocked Crossing'}
+            </Button>
+            <Button variant="outline" className="w-full justify-start" onClick={handleHeartbeat} disabled={heartbeatMutation.isPending}>
+              <Heart className="h-4 w-4 mr-2" />
+              {heartbeatMutation.isPending ? 'Sending...' : 'Send Heartbeat'}
             </Button>
           </div>
           {lastAction && (
@@ -112,18 +112,18 @@ export default function DemoPage() {
           <div className="flex items-center gap-3">
             <Radio className="h-4 w-4 text-muted-foreground" />
             <StatusBadge
-              variant={MOCK_STATUS.companion.online ? 'online' : 'offline'}
-              label={MOCK_STATUS.companion.online ? 'Online' : 'Offline'}
+              variant={effectiveStatus.companion.online ? 'online' : 'offline'}
+              label={effectiveStatus.companion.online ? 'Online' : 'Offline'}
             />
           </div>
-          {MOCK_STATUS.companion.lastSeen && (
+          {effectiveStatus.companion.lastSeen && (
             <p className="text-[10px] text-muted-foreground font-mono">
-              Last heartbeat: {new Date(MOCK_STATUS.companion.lastSeen).toLocaleString()}
+              Last heartbeat: {new Date(effectiveStatus.companion.lastSeen).toLocaleString()}
             </p>
           )}
-          {MOCK_STATUS.companion.companionId && (
+          {effectiveStatus.companion.companionId && (
             <p className="text-[10px] text-muted-foreground font-mono">
-              ID: {MOCK_STATUS.companion.companionId}
+              ID: {effectiveStatus.companion.companionId}
             </p>
           )}
         </section>
