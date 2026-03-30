@@ -14,6 +14,9 @@ export default function DashboardPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  // Subscribe to realtime updates
+  useCrossingsRealtime();
+
   const { data: status, isLoading: statusLoading } = useStatusQuery();
   const { data: allCrossings, isLoading: crossingsLoading } = useCrossingsQuery();
 
