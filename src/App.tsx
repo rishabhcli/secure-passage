@@ -21,23 +21,25 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/airlock" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/airlock/crossings/:id" element={<ProtectedRoute><CrossingDetail /></ProtectedRoute>} />
-            <Route path="/connect" element={<ProtectedRoute><Connect /></ProtectedRoute>} />
-            <Route path="/demo" element={<ProtectedRoute><Demo /></ProtectedRoute>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <ThemeProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/airlock" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/airlock/crossings/:id" element={<ProtectedRoute><CrossingDetail /></ProtectedRoute>} />
+              <Route path="/connect" element={<ProtectedRoute><Connect /></ProtectedRoute>} />
+              <Route path="/demo" element={<ProtectedRoute><Demo /></ProtectedRoute>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
