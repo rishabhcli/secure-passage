@@ -227,7 +227,7 @@ describe("use-airlock-api", () => {
     });
 
     await act(async () => {
-      await result.current.mutateAsync();
+      await result.current.mutateAsync({});
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
