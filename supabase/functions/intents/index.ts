@@ -65,7 +65,8 @@ serve(async (req) => {
   }
 });
 
-type SupabaseClient = ReturnType<typeof createClient>;
+// deno-lint-ignore no-explicit-any
+type SupabaseClient = any;
 
 async function processIntent(supabase: SupabaseClient, userId: string, body: IntentRequestBody) {
   const missingFields = getMissingIntentFields(body);
