@@ -227,7 +227,7 @@ describe("use-airlock-api", () => {
     });
 
     await act(async () => {
-      await result.current.mutateAsync();
+      await result.current.mutateAsync({});
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
@@ -283,6 +283,6 @@ describe("use-airlock-api", () => {
       wrapper: Wrapper,
     });
 
-    await expect(result.current.mutateAsync()).rejects.toThrow("Service Unavailable");
+    await expect(result.current.mutateAsync({})).rejects.toThrow("Service Unavailable");
   });
 });

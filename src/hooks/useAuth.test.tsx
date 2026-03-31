@@ -25,10 +25,10 @@ describe("useAuth", () => {
         },
       },
     });
-    mockSupabase.auth.onAuthStateChange.mockImplementation((callback) => {
+    mockSupabase.auth.onAuthStateChange.mockImplementation(((callback: any) => {
       authChangeHandler = callback;
       return { data: { subscription: { unsubscribe: vi.fn() } } };
-    });
+    }) as any);
     mockSupabase.auth.signOut.mockResolvedValue({ error: null });
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
