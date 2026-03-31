@@ -283,6 +283,6 @@ describe("use-airlock-api", () => {
       wrapper: Wrapper,
     });
 
-    await expect(result.current.mutateAsync()).rejects.toThrow("Service Unavailable");
+    await expect(result.current.mutateAsync({})).rejects.toThrow("Service Unavailable");
   });
 });

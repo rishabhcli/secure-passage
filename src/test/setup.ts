@@ -8,22 +8,25 @@ vi.mock("framer-motion", () => {
     {},
     {
       get: (_target, tagName: string) =>
-        React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
-          (
-            {
-              animate: _animate,
+        React.forwardRef<HTMLElement, Record<string, unknown>>(
+          (props, ref) => {
+            const {
+              animate: _a,
               children,
-              exit: _exit,
-              initial: _initial,
-              layout: _layout,
-              transition: _transition,
-              variants: _variants,
-              whileHover: _whileHover,
-              whileTap: _whileTap,
-              ...props
-            },
-            ref,
-          ) => React.createElement(tagName, { ...props, ref }, children),
+              exit: _e,
+              initial: _i,
+              layout: _l,
+              transition: _t,
+              variants: _v,
+              whileHover: _wh,
+              whileTap: _wt,
+              whileInView: _wiv,
+              dragConstraints: _dc,
+              onDragEnd: _ode,
+              ...rest
+            } = props as any;
+            return React.createElement(tagName, { ...rest, ref }, children as React.ReactNode);
+          },
         ),
     },
   );
